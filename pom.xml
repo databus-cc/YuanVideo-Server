@@ -5,8 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cc.databus</groupId>
-    <artifactId>YuanVideo-Server</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
+    <artifactId>YuanVideo</artifactId>
+    <version>0.0.1</version>
 
 </project>
