@@ -4,7 +4,6 @@ import javax.persistence.*;
 
 public class Bgm {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     private String author;
