@@ -63,8 +63,8 @@ public class Videos {
 
     /**
      * 视频状态：
-1、发布成功
-2、禁止播放，管理员操作
+     * 1、发布成功
+     * 2、禁止播放，管理员操作
      */
     private Integer status;
 
@@ -252,12 +252,12 @@ public class Videos {
 
     /**
      * 获取视频状态：
-1、发布成功
-2、禁止播放，管理员操作
+     * 1、发布成功
+     * 2、禁止播放，管理员操作
      *
      * @return status - 视频状态：
-1、发布成功
-2、禁止播放，管理员操作
+     * 1、发布成功
+     * 2、禁止播放，管理员操作
      */
     public Integer getStatus() {
         return status;
@@ -265,12 +265,12 @@ public class Videos {
 
     /**
      * 设置视频状态：
-1、发布成功
-2、禁止播放，管理员操作
+     * 1、发布成功
+     * 2、禁止播放，管理员操作
      *
      * @param status 视频状态：
-1、发布成功
-2、禁止播放，管理员操作
+     *               1、发布成功
+     *               2、禁止播放，管理员操作
      */
     public void setStatus(Integer status) {
         this.status = status;
