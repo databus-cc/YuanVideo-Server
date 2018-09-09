@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     public boolean queryUsernameIfExist(String username) {
         Users user = new Users();
         user.setUsername(username);
-        return Objects.isNull(userMapper.selectOne(user));
+        return Objects.nonNull(userMapper.selectOne(user));
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
