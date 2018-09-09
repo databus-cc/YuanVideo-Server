@@ -1,9 +1,11 @@
-package cc.databus.video.server.rest;
+package cc.databus.video.server.rest.controller;
 
 import cc.databus.common.JsonResponse;
 import cc.databus.common.MD5Utils;
 import cc.databus.video.server.service.UserService;
 import cc.databus.videos.server.pojo.Users;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,11 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/register")
-public class RegisterController {
+@Api(value = "用户操作接口", tags = {"注册","登录","修改"})
+public class UserController {
 
     @Autowired
     private UserService userService;
 
+    @ApiOperation(value = "用户注册", notes = "用户注册接口")
     @PostMapping("/")
     public JsonResponse register(@RequestBody Users user) {
         // 1. username and password not null and empty

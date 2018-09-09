@@ -22,11 +22,32 @@ public class JsonResponse {
      */
     private Object data = null;
 
-    // common used ones
-    private static JsonResponse OK = new JsonResponse(ResponseStatus.OK.status(), ResponseStatus.OK.errMsg());
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
 
     public static JsonResponse ok() {
-        return OK;
+        return new JsonResponse(ResponseStatus.OK.status(), ResponseStatus.OK.errMsg());
     }
 
     public static JsonResponse ok(Object data) {

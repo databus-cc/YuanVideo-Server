@@ -1,6 +1,7 @@
 package cc.databus.videos.server.pojo;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
 
 public class Users {
     @Id
