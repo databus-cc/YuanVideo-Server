@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 @RestController
-@RequestMapping("/register")
+@RequestMapping("/")
 @Api(value = "用户操作接口", tags = {"注册","登录","修改"})
 public class UserController {
 
@@ -22,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @ApiOperation(value = "用户注册", notes = "用户注册接口")
-    @PostMapping("/")
+    @PostMapping("/register")
     public JsonResponse register(@RequestBody Users user) {
         // 1. username and password not null and empty
         if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getPassword())) {
@@ -45,5 +47,28 @@ public class UserController {
 
         user.setPassword("");
         return JsonResponse.ok(user);
+    }
+
+    @ApiOperation(value = "用户登录", notes = "用户登录接口", tags = "登录")
+    @PostMapping("/login")
+    public JsonResponse login(@RequestBody Users user) {
+        String username = user.getUsername();
+        String password = user.getPassword();
+
+        // 1. check username and password not null
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+            return JsonResponse.badRequest("用户名和密码不能为空");
+        }
+
+        // 2. check user exist
+        Users queryResult = userService.queryUserForLogin(username, MD5Utils.md5(password));
+
+        if (Objects.isNull(queryResult)) {
+            return JsonResponse.badRequest("用户不存在或者用户名密码不匹配" );
+        }
+        else {
+            queryResult.setPassword("");
+            return JsonResponse.ok(queryResult);
+        }
     }
 }
