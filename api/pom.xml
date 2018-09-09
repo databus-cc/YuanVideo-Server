@@ -74,6 +74,12 @@
             <version>1.2.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.7</version>
+        </dependency>
+
 
         <dependency>
             <groupId>cc.databus</groupId>
@@ -86,6 +92,12 @@
             <groupId>cc.databus</groupId>
             <artifactId>pojo</artifactId>
             <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>cc.databus</groupId>
+            <artifactId>service</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

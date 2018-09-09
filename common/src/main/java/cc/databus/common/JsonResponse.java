@@ -29,6 +29,10 @@ public class JsonResponse {
         return OK;
     }
 
+    public static JsonResponse ok(Object data) {
+        return new JsonResponse(ResponseStatus.OK.status(), ResponseStatus.OK.errMsg(), data);
+    }
+
     public static JsonResponse badRequest(String errMsg) {
         return new JsonResponse(ResponseStatus.BadRequest.status(), errMsg);
     }
