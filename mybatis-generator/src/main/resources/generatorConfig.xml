@@ -28,9 +28,13 @@
         <javaClientGenerator targetPackage="cc.databus.videos.server.mapper" targetProject="../pojo/src/main/java"
                              type="XMLMAPPER"/>
 
-        <table tableName="bgm">
-            <!--mysql 配置-->
-            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
-        </table>
+        <table tableName="bgm"/>
+        <table tableName="comments"/>
+        <table tableName="search_records"/>
+        <table tableName="users"/>
+        <table tableName="users_fans"/>
+        <table tableName="users_like_videos"/>
+        <table tableName="users_report"/>
+        <table tableName="videos"/>
     </context>
 </generatorConfiguration>
