@@ -42,6 +42,8 @@ public class UserController {
         user.setFollowCounts(0);
 
         userService.saveUser(user);
+
+        user.setPassword("");
         return JsonResponse.ok(user);
     }
 }
