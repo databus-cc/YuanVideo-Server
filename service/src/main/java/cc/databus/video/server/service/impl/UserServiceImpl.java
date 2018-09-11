@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.Objects;
 
@@ -17,6 +18,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UsersMapper userMapper;
 
+
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
     public boolean queryUsernameIfExist(String username) {
@@ -24,6 +26,17 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
         return Objects.nonNull(userMapper.selectOne(user));
     }
+
+    @Override
+    public Users queryUserForLogin(String username, String password) {
+        Example userExample = new Example(Users.class);
+        Example.Criteria criteria = userExample.createCriteria();
+        criteria.andEqualTo("username", username)
+                .andEqualTo("password", password);
+
+        return userMapper.selectOneByExample(userExample);
+    }
+
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
