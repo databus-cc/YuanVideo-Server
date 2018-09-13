@@ -25,4 +25,10 @@ public interface UserService {
      */
      void saveUser(Users user);
 
+    /**
+     * Update user
+     * @param user updated user
+     */
+     void updateUser(Users user);
+
 }

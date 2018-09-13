@@ -44,4 +44,13 @@ public class UserServiceImpl implements UserService {
         user.setId(UUIDGenerator.generate());
         userMapper.insert(user);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void updateUser(Users user) {
+        Example userExample = new Example(Users.class);
+        Example.Criteria criteria = userExample.createCriteria();
+        criteria.andEqualTo("id", user.getId());
+        userMapper.updateByExampleSelective(user, userExample);
+    }
 }

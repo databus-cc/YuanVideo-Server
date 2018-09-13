@@ -1,111 +1,84 @@
 package cc.databus.video.server.rest.controller;
 
 import cc.databus.common.JsonResponse;
-import cc.databus.common.MD5Utils;
-import cc.databus.common.UUIDGenerator;
 import cc.databus.video.server.service.UserService;
-import cc.databus.video.util.RedisOperator;
 import cc.databus.videos.server.pojo.Users;
-import cc.databus.videos.server.vo.UserVO;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
-@RequestMapping("/")
-@Api(value = "用户操作接口", tags = {"注册","登录","修改"})
+@Api(value = "用户相关业务的接口", tags = {"用户相关业务的controller"})
+@RequestMapping("/users")
 public class UserController {
-
-    private static final String USER_REDIS_SESSION = "user-redis-session";
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private RedisOperator redisOperator;
+    private static final String FILE_SPACE = "/Users/jianyuan/Personal/Codes/yuanvideo/api/space";
 
-    @ApiOperation(value = "用户注册", notes = "用户注册接口")
-    @PostMapping("/register")
-    public JsonResponse register(@RequestBody Users user) {
-        // 1. username and password not null and empty
-        if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getPassword())) {
-            return JsonResponse.badRequest("用户名和密码不能为空");
+    @PostMapping("/uploadFace")
+    public JsonResponse uploadFace(String userId, @RequestParam("file") MultipartFile[] files) {
+
+        if (StringUtils.isBlank(userId)) {
+            return JsonResponse.badRequest("用户id不能为空");
         }
 
-        // 2. username not exist
-        if (userService.queryUsernameIfExist(user.getUsername())) {
-            return JsonResponse.badRequest(String.format("用户名%s已存在", user.getUsername()));
+        if (files == null || files.length == 0) {
+            return JsonResponse.badRequest("上传出错.");
         }
 
-        // 3. save user and register info
-        user.setNickname(user.getUsername());
-        user.setPassword(MD5Utils.md5(user.getPassword()));
-        user.setFansCounts(0);
-        user.setReceiveLikeCounts(0);
-        user.setFollowCounts(0);
+        FileOutputStream fos = null;
+        InputStream inputStream = null;
 
-        userService.saveUser(user);
+        String fileName = null;
+        try {
+            fileName = files[0].getOriginalFilename();
+            if (StringUtils.isNotBlank(fileName)) {
+                Path directoryPath = Paths.get(FILE_SPACE, userId, "face");
+                File directoryFile = directoryPath.toFile();
+                if (!directoryFile.exists()) {
+                    directoryFile.mkdirs();
+                }
 
-        UserVO voUser = createUserViewObject(user);
-        saveUserSession(user.getId(), voUser.getUserToken());
+                File outputFile = new File(directoryFile, fileName);
 
-        return JsonResponse.ok(voUser);
-    }
-
-    @ApiOperation(value = "用户登录", notes = "用户登录接口", tags = "登录")
-    @PostMapping("/login")
-    public JsonResponse login(@RequestBody Users user) {
-        String username = user.getUsername();
-        String password = user.getPassword();
-
-        // 1. check username and password not null
-        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
-            return JsonResponse.badRequest("用户名和密码不能为空");
+                fos = new FileOutputStream(outputFile);
+                inputStream = files[0].getInputStream();
+                IOUtils.copy(inputStream, fos);
+                fos.flush();
+            }
+        }
+        catch (IOException e) {
+            // TODO: need a more
+            e.printStackTrace();
+            JsonResponse.badRequest("上传出错 - " + ExceptionUtils.getRootCauseMessage(e));
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(fos);
         }
 
-        // 2. check user exist
-        Users queryResult = userService.queryUserForLogin(username, MD5Utils.md5(password));
+        if (StringUtils.isNotBlank(fileName)) {
+            Users user = new Users();
+            user.setId(userId);
+            user.setFaceImage(fileName);
 
-        if (Objects.isNull(queryResult)) {
-            return JsonResponse.badRequest("用户不存在或者用户名密码不匹配" );
+            userService.updateUser(user);
         }
-        else {
-            UserVO voUser = createUserViewObject(queryResult);
-            saveUserSession(queryResult.getId(), voUser.getUserToken());
 
-            return JsonResponse.ok(voUser);
-        }
-    }
-
-    @ApiOperation(value = "用户注销", notes = "用户注销接口", tags = "注销")
-    @ApiImplicitParam(name = "userId", value = "用户id", required = true, dataType = "String", paramType = "query")
-    @PostMapping("/logout")
-    public JsonResponse logout(String userId) {
-        redisOperator.delete(USER_REDIS_SESSION + ":" + userId);
         return JsonResponse.ok();
     }
 
-    private void saveUserSession(String userId, String uniqueToken) {
-        redisOperator.set(USER_REDIS_SESSION + ":" + userId, uniqueToken);
-    }
-
-    private UserVO createUserViewObject(Users userModel) {
-        String uniqueToken = UUIDGenerator.generate().toUpperCase();
-        UserVO voUser = new UserVO();
-        BeanUtils.copyProperties(userModel, voUser);
-        voUser.setUserToken(uniqueToken);
-        // remove sensitive field
-        voUser.setPassword("");
-        return voUser;
-    }
 }
