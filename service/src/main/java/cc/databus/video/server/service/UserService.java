@@ -31,4 +31,9 @@ public interface UserService {
      */
      void updateUser(Users user);
 
+    /**
+     * Query user per userId
+     * @param userId userId
+     */
+     Users getUser(String userId);
 }

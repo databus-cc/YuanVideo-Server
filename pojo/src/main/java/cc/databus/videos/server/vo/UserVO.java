@@ -1,5 +1,8 @@
 package cc.databus.videos.server.vo;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class UserVO {
     private String id;
 
@@ -16,6 +19,7 @@ public class UserVO {
     /**
      * 密码
      */
+    @JsonIgnore
     private String password;
 
     /**

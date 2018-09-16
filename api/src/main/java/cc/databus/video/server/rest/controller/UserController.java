@@ -3,15 +3,14 @@ package cc.databus.video.server.rest.controller;
 import cc.databus.common.JsonResponse;
 import cc.databus.video.server.service.UserService;
 import cc.databus.videos.server.pojo.Users;
+import cc.databus.videos.server.vo.UserVO;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -78,7 +77,24 @@ public class UserController {
             userService.updateUser(user);
         }
 
-        return JsonResponse.ok();
+        return JsonResponse.ok(fileName);
     }
 
+
+    @GetMapping("/{userId}")
+    public JsonResponse getUser(@PathVariable String userId) {
+        if (StringUtils.isBlank(userId)) {
+            return JsonResponse.badRequest("用户id不能是空");
+        }
+        Users user =  userService.getUser(userId);
+
+        if (user == null) {
+            return JsonResponse.badRequest("用户不存在");
+        }
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        userVO.setPassword("");
+
+        return JsonResponse.ok(userVO);
+    }
 }
