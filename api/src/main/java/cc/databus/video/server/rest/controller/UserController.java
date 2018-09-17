@@ -25,7 +25,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    private static final String FILE_SPACE = "/Users/jianyuan/Personal/Codes/yuanvideo/api/space";
+    public static final String FILE_SPACE = "/Users/jianyuan/Personal/Codes/yuanvideo/api/space";
 
     @PostMapping("/uploadFace")
     public JsonResponse uploadFace(String userId, @RequestParam("file") MultipartFile[] files) {
