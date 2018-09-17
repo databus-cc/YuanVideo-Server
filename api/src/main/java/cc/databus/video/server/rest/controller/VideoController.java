@@ -1,10 +1,14 @@
 package cc.databus.video.server.rest.controller;
 
 import cc.databus.common.JsonResponse;
+import cc.databus.video.server.service.VideoService;
+import cc.databus.video.util.VideoStatus;
+import cc.databus.videos.server.pojo.Videos;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 import static cc.databus.video.server.rest.controller.UserController.FILE_SPACE;
 
@@ -23,6 +28,9 @@ import static cc.databus.video.server.rest.controller.UserController.FILE_SPACE;
 @RequestMapping("/videos")
 @RestController
 public class VideoController {
+
+    @Autowired
+    private VideoService videoService;
 
     @ApiOperation(value = "上传视频", notes = "上传视频的接口")
     @ApiImplicitParams({
@@ -80,6 +88,19 @@ public class VideoController {
             IOUtils.closeQuietly(fos);
         }
 
+        // 保存视频到数据库
+        Videos videos = new Videos();
+        videos.setUserId(userId);
+        videos.setAudioId(bgmId);
+        videos.setVideoPath(fileName);
+        videos.setVideoSeconds((float) duration);
+        videos.setVideoHeight(height);
+        videos.setVideoWidth(width);
+        videos.setVideoDesc(desc);
+        videos.setStatus(VideoStatus.OK.value);
+        videos.setCreateTime(new Date());
+
+        videoService.saveVideo(videos);
 
         return JsonResponse.ok(fileName);
     }
