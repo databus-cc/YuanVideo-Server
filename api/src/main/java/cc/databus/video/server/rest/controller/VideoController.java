@@ -1,9 +1,11 @@
 package cc.databus.video.server.rest.controller;
 
 import cc.databus.common.JsonResponse;
+import cc.databus.common.UUIDGenerator;
 import cc.databus.video.server.service.VideoService;
 import cc.databus.video.util.VideoStatus;
 import cc.databus.videos.server.pojo.Videos;
+import cc.databus.videos.utils.PagedResult;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -14,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -32,6 +31,50 @@ public class VideoController {
     @Autowired
     private VideoService videoService;
 
+    @PostMapping(value = "/showAll")
+    public JsonResponse showAll(Integer page) {
+        if (page == null) {
+            page = 1;
+        }
+
+
+        PagedResult result = videoService.getAllVideos(page, 5);
+        return JsonResponse.ok(result);
+    }
+
+    @ApiOperation(value = "上传视频封面", notes = "上传视频封面的接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "String", paramType = "form"),
+            @ApiImplicitParam(name = "bgmId", value = "背景音乐Id", required = true, dataType = "String", paramType = "form"),
+    })
+    @PostMapping(value = "/uploadCover", headers = {"content-type=multipart/form-data"})
+    public JsonResponse uploadCover(String userId, String videoId, @ApiParam(value = "短视频封面", required = true) MultipartFile file) {
+        if (StringUtils.isBlank(userId)) {
+            return JsonResponse.badRequest("用户Id不能是空。");
+        }
+
+        if (StringUtils.isBlank(videoId)) {
+            return JsonResponse.badRequest("视频Id不能是空。");
+        }
+        String coverName = file.getOriginalFilename();
+        try {
+            File dir = Paths.get(FILE_SPACE, userId, "video", "cover").toFile();
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            IOUtils.copy(file.getInputStream(), new FileOutputStream(new File(dir, coverName)));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return JsonResponse.badRequest("上传视频封面失败 - " + ExceptionUtils.getMessage(e));
+        }
+
+
+        videoService.updateCover(videoId, coverName);
+
+        return JsonResponse.ok();
+    }
+
     @ApiOperation(value = "上传视频", notes = "上传视频的接口")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "String", paramType = "form"),
@@ -42,7 +85,7 @@ public class VideoController {
             @ApiImplicitParam(name = "desc", value = "视频描述", required = false, dataType = "String", paramType = "form"),
     })
     @PostMapping(value = "/", headers = {"content-type=multipart/form-data"})
-    public JsonResponse uploadFace(String userId,
+    public JsonResponse uploadVideo(String userId,
                                    String bgmId,
                                    double duration,
                                    int width,
@@ -68,7 +111,7 @@ public class VideoController {
                 Path directoryPath = Paths.get(FILE_SPACE, userId, "video");
                 File directoryFile = directoryPath.toFile();
                 if (!directoryFile.exists()) {
-                    directoryFile.mkdirs();
+                    directoryFile.mkdir();
                 }
 
                 File outputFile = new File(directoryFile, fileName);
@@ -90,6 +133,7 @@ public class VideoController {
 
         // 保存视频到数据库
         Videos videos = new Videos();
+        videos.setId(UUIDGenerator.generate());
         videos.setUserId(userId);
         videos.setAudioId(bgmId);
         videos.setVideoPath(fileName);
@@ -102,6 +146,6 @@ public class VideoController {
 
         videoService.saveVideo(videos);
 
-        return JsonResponse.ok(fileName);
+        return JsonResponse.ok(videos.getId());
     }
 }
