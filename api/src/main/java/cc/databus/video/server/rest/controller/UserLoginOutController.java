@@ -100,8 +100,7 @@ public class UserLoginOutController {
 
     private UserVO createUserViewObject(Users userModel) {
         String uniqueToken = UUIDGenerator.generate().toUpperCase();
-        UserVO voUser = new UserVO();
-        BeanUtils.copyProperties(userModel, voUser);
+        UserVO voUser = UserVO.fromUserPojo(userModel);
         voUser.setUserToken(uniqueToken);
         // remove sensitive field
         voUser.setPassword("");

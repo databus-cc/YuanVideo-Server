@@ -42,6 +42,13 @@ public class VideoController {
         return JsonResponse.ok(result);
     }
 
+    /**
+     * Path <code>/video/cover/{coverName}</code>
+     * @param userId
+     * @param videoId
+     * @param file
+     * @return
+     */
     @ApiOperation(value = "上传视频封面", notes = "上传视频封面的接口")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "String", paramType = "form"),
@@ -75,6 +82,10 @@ public class VideoController {
         return JsonResponse.ok();
     }
 
+
+    /**
+     * Video path: <code>/video/{videoName}</code>
+     */
     @ApiOperation(value = "上传视频", notes = "上传视频的接口")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "String", paramType = "form"),
@@ -108,7 +119,7 @@ public class VideoController {
         try {
             fileName = file.getOriginalFilename();
             if (StringUtils.isNotBlank(fileName)) {
-                Path directoryPath = Paths.get(FILE_SPACE, userId, "video");
+                Path directoryPath = Paths.get(FILE_SPACE, "video");
                 File directoryFile = directoryPath.toFile();
                 if (!directoryFile.exists()) {
                     directoryFile.mkdir();

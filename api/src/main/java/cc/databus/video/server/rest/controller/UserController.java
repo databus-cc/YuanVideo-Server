@@ -27,6 +27,13 @@ public class UserController {
 
     public static final String FILE_SPACE = "/Users/jianyuan/Personal/Codes/yuanvideo/api/space";
 
+    /**
+     * user face image server pathL:
+     * <code>{ServerUrl}/face/{imageName}</code>
+     * @param userId
+     * @param files
+     * @return
+     */
     @PostMapping("/uploadFace")
     public JsonResponse uploadFace(String userId, @RequestParam("file") MultipartFile[] files) {
 
@@ -45,7 +52,7 @@ public class UserController {
         try {
             fileName = files[0].getOriginalFilename();
             if (StringUtils.isNotBlank(fileName)) {
-                Path directoryPath = Paths.get(FILE_SPACE, userId, "face");
+                Path directoryPath = Paths.get(FILE_SPACE, "face");
                 File directoryFile = directoryPath.toFile();
                 if (!directoryFile.exists()) {
                     directoryFile.mkdirs();
@@ -97,4 +104,6 @@ public class UserController {
 
         return JsonResponse.ok(userVO);
     }
+
+
 }
