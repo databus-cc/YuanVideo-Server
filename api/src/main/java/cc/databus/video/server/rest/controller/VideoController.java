@@ -65,7 +65,7 @@ public class VideoController {
         }
         String coverName = file.getOriginalFilename();
         try {
-            File dir = Paths.get(FILE_SPACE, userId, "video", "cover").toFile();
+            File dir = Paths.get(FILE_SPACE, "video", "cover").toFile();
             if (!dir.exists()) {
                 dir.mkdirs();
             }

@@ -1,7 +1,9 @@
 package cc.databus.videos.server.vo;
 
 
+import cc.databus.videos.server.pojo.Users;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.beans.BeanUtils;
 
 public class UserVO {
     private String id;
@@ -193,5 +195,18 @@ public class UserVO {
      */
     public void setReceiveLikeCounts(Integer receiveLikeCounts) {
         this.receiveLikeCounts = receiveLikeCounts;
+    }
+
+    /**
+     * User face image:
+     * <code>{ServerUrl}/{userId}/face/{imageName}</code>
+     * @param user
+     * @return
+     */
+    public static UserVO fromUserPojo(Users user) {
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        userVO.setPassword("");
+        return userVO;
     }
 }
